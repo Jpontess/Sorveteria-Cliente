@@ -26,13 +26,14 @@ export function CheckoutPage() {
 
     try {
       // 1. Preparar o objeto para o Backend
-      // O backend espera: { customerName, customerPhone, address, items: [], totalAmount, paymentMethod }
       const orderPayload = {
         customerName: formData.customerName,
         customerPhone: formData.customerPhone,
         address: formData.address,
         paymentMethod: formData.paymentMethod,
         totalAmount: cartTotal,
+        // 👇 CORREÇÃO: Usar 'Pendente' para bater com o Enum do seu Backend
+        status: 'Pendente', 
         items: cart.map(item => ({
           product: item._id, // O ID do produto (ref)
           name: item.name,
@@ -47,9 +48,10 @@ export function CheckoutPage() {
       // 3. Sucesso! Limpar carrinho e redirecionar
       clearCart();
       alert('Pedido realizado com sucesso! O restaurante já foi notificado.');
-      navigate('/'); // Volta para a Home (ou para uma página de "Pedido Confirmado")
+      navigate('/'); // Volta para a Home
 
     } catch (error) {
+      console.error(error);
       alert('Erro ao finalizar pedido: ' + error.message);
     } finally {
       setIsLoading(false);
@@ -61,7 +63,7 @@ export function CheckoutPage() {
     return (
       <div className="container mt-5 text-center text-white">
         <h2>Seu carrinho está vazio 😢</h2>
-        <p className="lead">Adicione alguns itens antes de finalizar.</p>
+        <p className="lead">Adicione alguns sorvetes deliciosos antes de finalizar.</p>
         <Link to="/" className="btn btn-primary mt-3">
           Voltar para o Cardápio
         </Link>
