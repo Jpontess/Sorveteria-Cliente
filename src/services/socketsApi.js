@@ -1,6 +1,6 @@
 import io from 'socket.io-client';
 
-const SOCKET_URL = 'http://localhost:8080';
+const SOCKET_URL = 'https://sorveteria-backend-h7bw.onrender.com';
 
 export const socket = io(SOCKET_URL, {
   autoConnect: true,

@@ -2,7 +2,7 @@
 
 // 1. Defina a URL base do seu backend.
 // (Mude isso para a URL correta do seu servidor Node.js/Java/etc.)
-const API_URL = 'http://localhost:8080/api/products';
+const API_URL = 'https://sorveteria-backend-h7bw.onrender.com/api/products';
 
 // NOTA: 'fetch' não simula mais atraso. O atraso será o da sua rede real.
 // ... (o resto do arquivo continua igual) ...
