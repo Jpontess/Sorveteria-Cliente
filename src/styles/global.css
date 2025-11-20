@@ -1,32 +1,113 @@
 /* src/styles/global.css */
 
-/* 1. Definir as nossas cores de marca (Preto, Branco) */
+/* --- Variáveis da Marca (Tema Escuro Premium) --- */
 :root {
-  --brand-black: #212529; /* O 'dark' do Bootstrap */
-  --brand-white: #ffffff;
-  --brand-light-gray: #f8f9fa; /* O 'branco' de fundo anterior */
+  --bg-color: #121212;       /* Preto profundo */
+  --card-bg: #1e1e1e;        /* Cinza escuro para destacar do fundo */
+  --text-main: #f8f9fa;      /* Branco suave */
+  --text-muted: #adb5bd;     /* Cinza claro */
+  --brand-red: #e63946;      /* Vermelho vibrante (Cor da Ação) */
+  --brand-red-hover: #c92a35;
+  --accent-yellow: #ffb703;  /* Amarelo para detalhes/estrelas */
 }
 
+/* --- Base --- */
 body {
-  /* 👇 --- AQUI ESTÁ A MUDANÇA --- 👇 */
-  
-  /* 2. Fundo 'Preto' (escuro) */
-  background-color: var(--brand-black); 
-  
-  /* 3. Cor de texto 'Branco' (claro) */
-  color: var(--brand-light-gray);
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
 }
 
-/* 4. Os botões continuam AZUIS por defeito. */
-
-/* 5. Garantir que o texto de destaque azul (do Header) funciona */
-.text-brand-blue {
-  /* Esta é a cor 'primary' do Bootstrap */
-  color: #0d6efd !important;
+h1, h2, h3, h4, h5 {
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
-/* 6. Garantir que os cards (que são brancos) tenham texto escuro
-      (O Bootstrap já faz isto, mas é uma boa garantia) */
+/* --- Personalização do Bootstrap --- */
+
+/* Botão Primário (Vermelho) */
+.btn-primary {
+  background-color: var(--brand-red);
+  border-color: var(--brand-red);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.6rem 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover, .btn-primary:active, .btn-primary:focus {
+  background-color: var(--brand-red-hover) !important;
+  border-color: var(--brand-red-hover) !important;
+  box-shadow: 0 0 15px rgba(230, 57, 70, 0.4) !important; /* Brilho vermelho */
+  transform: translateY(-2px);
+}
+
+/* Botão Sucesso (Verde) */
+.btn-success {
+  background-color: #2a9d8f;
+  border: none;
+}
+
+/* --- Cartões de Produto (O "Tchan" do site) --- */
 .card {
-  color: var(--brand-black);
+  background-color: var(--card-bg);
+  border: 1px solid #333; /* Borda subtil */
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-8px); /* Flutua para cima */
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5); /* Sombra forte */
+  border-color: var(--brand-red); /* Borda vermelha acende */
+}
+
+.card-title {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.card-text {
+  color: var(--text-muted);
+}
+
+/* Imagem do Produto */
+.card-img-top {
+  transition: transform 0.5s ease;
+}
+
+.card:hover .card-img-top img {
+  transform: scale(1.05); /* Zoom suave na foto */
+}
+
+/* Preço */
+h4.text-dark {
+  color: var(--text-main) !important; /* Força o preço a ser branco no tema escuro */
+  font-size: 1.4rem;
+}
+
+/* Navbar customizada */
+.navbar-dark.bg-dark {
+  background-color: #000 !important; /* Preto absoluto */
+  border-bottom: 1px solid #333;
+}
+
+/* --- Banner Hero (Para a Home) --- */
+.hero-banner {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+  padding: 4rem 2rem;
+  border-radius: 1rem;
+  margin-bottom: 3rem;
+  border-left: 5px solid var(--brand-red);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.hero-title {
+  font-size: 3rem;
+  background: -webkit-linear-gradient(#fff, #ccc);
+  -webkit-background-clip: text;
+  background-clip: text; /* Adicionado para corrigir o aviso */
+  -webkit-text-fill-color: transparent;
 }

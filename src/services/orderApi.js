@@ -1,7 +1,7 @@
 // src/services/orderApi.js
 
 // URL do seu backend no Render
-const API_URL = 'https://sorveteria-backend-h7bw.onrender.com/api/order';
+const API_URL = 'http://localhost:8080/api/order';
 
 export const createOrder = async (orderData) => {
   try {
