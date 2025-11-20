@@ -1,7 +1,7 @@
 import { AppRoutes } from './routes/appRoutes';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
-import { CartProvider } from './context/cartContext';
+import { CartProvider } from './context/CartContext';
 // (No futuro, o Navbar do cliente pode vir aqui)
 
 export function App() {
