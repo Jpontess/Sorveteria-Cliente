@@ -71,7 +71,7 @@ ${cartItemsString}
       const encodedMessage = encodeURIComponent(message);
       
       // SEU NÚMERO DE TELEFONE (Admin)
-      const adminPhone = "5511995316895"; 
+      const adminPhone = "5511992634584"; 
       
       const whatsappUrl = `https://wa.me/${adminPhone}?text=${encodedMessage}`;
 
