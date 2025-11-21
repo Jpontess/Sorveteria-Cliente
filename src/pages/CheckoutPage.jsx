@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // 1. Removido useNavigate
 import { useCart } from '../context/CartContext';
 import { createOrder } from '../services/orderApi';
 
 export function CheckoutPage() {
   const { cart, cartTotal, clearCart } = useCart();
-  const navigate = useNavigate();
+  // 2. Removido const navigate = useNavigate(); pois não é usado
   const [isLoading, setIsLoading] = useState(false);
 
   // Estado do formulário
@@ -40,11 +40,46 @@ export function CheckoutPage() {
         }))
       };
 
-      await createOrder(orderPayload);
+      // 1. Envia para a API e AGUARDA a resposta (para pegar o ID)
+      const response = await createOrder(orderPayload);
+      
+      // O backend retorna: { status: 'Sucesso', data: { order: { _id: '...', ... } } }
+      const savedOrder = response.data && response.data.order ? response.data.order : response; 
+      const orderId = savedOrder._id || 'N/A';
 
+      // 2. Prepara a mensagem do WhatsApp
+      const cartItemsString = cart
+        .map(item => `• ${item.quantity}x ${item.name}`)
+        .join('\n');
+
+      const message = `Olá, você poderia confirmar o meu pedido?
+      
+*Id:* #${orderId.slice(-6)}
+*Nome Cliente:* ${formData.customerName}
+*Endereço:* ${formData.address}
+*Pagamento:* ${formData.paymentMethod}
+*Valor do Produto:* R$ ${cartTotal.toFixed(2).replace('.', ',')}
+*Taxa de entrega:* Pendente
+
+
+*Itens:*
+${cartItemsString}
+
+*Valor final:* Pendente`;
+
+      // 3. Codifica a mensagem para URL
+      const encodedMessage = encodeURIComponent(message);
+      
+      // SEU NÚMERO DE TELEFONE (Admin)
+      const adminPhone = "5511995316895"; 
+      
+      const whatsappUrl = `https://wa.me/${adminPhone}?text=${encodedMessage}`;
+
+      // 4. Limpa o carrinho
       clearCart();
-      alert('Pedido realizado com sucesso! O restaurante já foi notificado.');
-      navigate('/'); 
+
+      // 5. Redireciona para o WhatsApp
+      window.location.href = whatsappUrl;
 
     } catch (error) {
       console.error(error);
@@ -114,7 +149,7 @@ export function CheckoutPage() {
                   {isLoading ? (
                     <span><i className="bi bi-hourglass-split me-2"></i>Enviando...</span>
                   ) : (
-                    <span><i className="bi bi-check-circle-fill me-2"></i>Confirmar Pedido</span>
+                    <span><i className="bi bi-whatsapp me-2"></i>Confirmar no WhatsApp</span>
                   )}
                 </button>
               </form>
@@ -130,21 +165,17 @@ export function CheckoutPage() {
           </h2>
 
           <div className="card border-0 shadow-lg">
-            <div className="card-body p-0"> {/* p-0 para a lista encostar nas bordas */}
+            <div className="card-body p-0"> 
               
               <ul className="list-group list-group-flush rounded-3">
-                {/* Cabeçalho da lista */}
                 <li className="list-group-item bg-dark text-white border-secondary d-flex justify-content-between align-items-center p-3">
                   <span className="fw-bold">Itens no Carrinho</span>
                   <span className="badge bg-primary rounded-pill">{cart.length}</span>
                 </li>
 
                 {cart.map((item) => (
-                  // bg-transparent para herdar a cor escura do card
                   <li key={item._id} className="list-group-item bg-transparent text-light border-secondary d-flex justify-content-between align-items-center p-3">
                     <div className="d-flex align-items-center">
-                      
-                      {/* MINIATURA DA FOTO */}
                       <div style={{ width: '50px', height: '50px', marginRight: '15px' }} className="bg-dark border border-secondary rounded overflow-hidden flex-shrink-0 d-flex align-items-center justify-content-center">
                          {item.image ? (
                            <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -152,7 +183,6 @@ export function CheckoutPage() {
                            <i className="bi bi-image text-muted" style={{ fontSize: '1.2rem' }}></i>
                          )}
                       </div>
-
                       <div>
                         <h6 className="my-0 fw-semibold">{item.name}</h6>
                         <small className="text-primary">Qtd: {item.quantity}</small>
@@ -164,11 +194,10 @@ export function CheckoutPage() {
                   </li>
                 ))}
                 
-                {/* Rodapé da lista (Total) */}
                 <li className="list-group-item bg-dark border-secondary p-4">
                   <div className="d-flex justify-content-between align-items-center">
-                    <span className="text-white text-uppercase small fw-bold">Total a Pagar</span>
-                    <strong className="text-primary fs-3">
+                    <span className="text-white text-uppercase small fw-bold">Total a Pagar:</span>
+                    <strong className="text-success fs-3">
                       R$ {cartTotal.toFixed(2).replace('.', ',')}
                     </strong>
                   </div>
