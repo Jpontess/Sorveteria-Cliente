@@ -35,12 +35,7 @@ export function Header() {
                 </span>
               )}
             </Link>
-
-            {/* Botão Hambúrguer (Só aparece no Mobile) */}
-            <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-              <span className="navbar-toggler-icon"></span>
-            </button>
-          </div>
+             </div>
 
           {/* 3. LINKS DE NAVEGAÇÃO (Escondidos no mobile, aparecem no meio no Desktop) */}
           <div className="collapse navbar-collapse" id="navbarNav">
