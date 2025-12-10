@@ -289,7 +289,7 @@ ${cartItemsString}`;
                 </div>
                 <div className="d-flex justify-content-between align-items-center mb-4">
                   <span className="text-secondary">Entrega</span>
-                  <span className="text-success fw-bold">Grátis</span>
+                  <span className="text-success fw-bold">A calcular</span>
                 </div>
 
                 <div className="d-flex justify-content-between align-items-center mb-4 pt-3 border-top border-secondary">
