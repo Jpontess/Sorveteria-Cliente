@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react'; // Adicionado useMemo
 import * as productApi from '../services/productApi';
 import { ProductCard } from '../components/ProductCard';
 import { socket } from '../services/socketsApi';
 
-// Removemos Link e useCart pois o Header global já cuida disso
-
 export function HomePage() {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // NOVA STATE: Controla qual categoria está selecionada
+  const [selectedCategory, setSelectedCategory] = useState('Todos');
   
   // Estado para o slideshow
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -55,6 +56,25 @@ export function HomePage() {
     };
   }, []);
 
+  // --- NOVA LÓGICA DE CATEGORIAS ---
+  
+  // 1. Extrai categorias únicas (useMemo para performance)
+  const categories = useMemo(() => {
+    // Pega todas as categorias, se não tiver, chama de 'Outros'
+    const uniqueCats = new Set(products.map(p => p.category || 'Outros'));
+    // Retorna array com 'Todos' na frente
+    return ['Todos', ...Array.from(uniqueCats)];
+  }, [products]);
+
+  // 2. Filtra os produtos baseado no botão clicado
+  const filteredProducts = products.filter(product => {
+    if (selectedCategory === 'Todos') return true;
+    const prodCat = product.category || 'Outros';
+    return prodCat === selectedCategory;
+  });
+
+  // --- FIM LÓGICA CATEGORIAS ---
+
   // Lógica do Slideshow
   const productsWithImages = products.filter(p => p.image && (p.image.startsWith('http') || p.image.startsWith('data:')));
 
@@ -77,6 +97,7 @@ export function HomePage() {
       );
     }
 
+    // Se não tem NENHUM produto no banco de dados
     if (products.length === 0) {
       return (
         <div className="text-center p-5 border border-secondary rounded bg-dark mt-4">
@@ -87,9 +108,22 @@ export function HomePage() {
       );
     }
 
+    // Se tem produtos no banco, mas NENHUM nessa categoria específica
+    if (filteredProducts.length === 0) {
+        return (
+          <div className="text-center py-5">
+            <p className="text-secondary fs-5">Nenhum produto encontrado na categoria "{selectedCategory}".</p>
+            <button onClick={() => setSelectedCategory('Todos')} className="btn btn-outline-danger mt-2">
+                Ver todos os produtos
+            </button>
+          </div>
+        );
+      }
+
+    // Renderiza a lista FILTRADA
     return (
       <div className="row g-4">
-        {products.map(product => (
+        {filteredProducts.map(product => (
           <div key={product._id} className="col-12 col-md-6 col-lg-4 col-xl-3">
             <ProductCard product={product} />
           </div>
@@ -101,13 +135,10 @@ export function HomePage() {
   return (
     <div style={{ backgroundColor: '#000', minHeight: '100vh', color: '#fff' }}>
       
-      {/* --- REMOVIDO O HEADER LOCAL (Usa o Global do App.jsx) --- */}
-
-      {/* Hero Section (Banner) */}
+      {/* Hero Section (Mantido igual) */}
       <section className="position-relative py-5 overflow-hidden" style={{ background: 'linear-gradient(180deg, #000 0%, #1a0505 100%)', borderBottom: '1px solid #333' }}>
         <div className="container px-4">
           <div className="row align-items-center gy-5">
-            
             {/* Texto Esquerda */}
             <div className="col-lg-6 text-center text-lg-start">
               <div className="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill border border-danger bg-danger bg-opacity-10 text-danger small fw-bold mb-4">
@@ -126,12 +157,9 @@ export function HomePage() {
                 <a href="#produtos" className="btn btn-danger btn-lg px-4 py-2 fw-bold shadow-lg">
                   Ver Cardápio
                 </a>
-               {/* <button className="btn btn-outline-secondary btn-lg px-4 py-2">
-                  Promoções
-                </button>*/}
               </div>
 
-              {/* Stats (Estatísticas) */}
+              {/* Stats */}
               <div className="row mt-5 pt-4 border-top border-secondary border-opacity-25">
                 <div className="col-4 text-center text-lg-start">
                   <div className="h3 fw-bold text-danger mb-0">50+</div>
@@ -177,16 +205,36 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Lista de Produtos */}
+      {/* Lista de Produtos + Filtros */}
       <section id="produtos" className="py-5">
         <div className="container px-4">
-          <div className="mb-5">
+          <div className="mb-4">
             <div className="d-flex align-items-center gap-3 mb-2">
               <div className="bg-danger" style={{ width: '50px', height: '4px', borderRadius: '2px' }}></div>
               <h2 className="h1 fw-bold text-white mb-0">Nossos Produtos</h2>
             </div>
             <p className="text-secondary lead">Sorvetes com preço de fábrica.</p>
           </div>
+
+          {/* --- NOVA BARRA DE FILTROS --- */}
+          {!isLoading && products.length > 0 && (
+            <div className="d-flex flex-wrap gap-2 mb-4 pb-2">
+              {categories.map(category => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`btn rounded-pill px-4 transition-all ${
+                    selectedCategory === category 
+                      ? 'btn-danger text-white' 
+                      : 'btn-outline-secondary text-light border-secondary'
+                  }`}
+                  style={{ transition: 'all 0.3s' }}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          )}
 
           {renderContent()}
         </div>
@@ -197,6 +245,9 @@ export function HomePage() {
         @keyframes fadeIn {
           from { opacity: 0.5; transform: scale(1.05); }
           to { opacity: 1; transform: scale(1); }
+        }
+        .transition-all {
+            transition: all 0.3s ease;
         }
       `}</style>
     </div>
