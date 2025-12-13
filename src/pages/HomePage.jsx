@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'; // Adicionado useMemo
+import React, { useState, useEffect, useMemo } from 'react';
 import * as productApi from '../services/productApi';
 import { ProductCard } from '../components/ProductCard';
 import { socket } from '../services/socketsApi';
@@ -6,11 +6,7 @@ import { socket } from '../services/socketsApi';
 export function HomePage() {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // NOVA STATE: Controla qual categoria está selecionada
   const [selectedCategory, setSelectedCategory] = useState('Todos');
-  
-  // Estado para o slideshow
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
@@ -56,26 +52,20 @@ export function HomePage() {
     };
   }, []);
 
-  // --- NOVA LÓGICA DE CATEGORIAS ---
-  
-  // 1. Extrai categorias únicas (useMemo para performance)
+  // --- LÓGICA DE CATEGORIAS ---
   const categories = useMemo(() => {
-    // Pega todas as categorias, se não tiver, chama de 'Outros'
     const uniqueCats = new Set(products.map(p => p.category || 'Outros'));
-    // Retorna array com 'Todos' na frente
-    return ['Todos', ...Array.from(uniqueCats)];
+    const sortedCats = Array.from(uniqueCats).sort();
+    return ['Todos', ...sortedCats];
   }, [products]);
 
-  // 2. Filtra os produtos baseado no botão clicado
   const filteredProducts = products.filter(product => {
     if (selectedCategory === 'Todos') return true;
     const prodCat = product.category || 'Outros';
     return prodCat === selectedCategory;
   });
 
-  // --- FIM LÓGICA CATEGORIAS ---
-
-  // Lógica do Slideshow
+  // --- SLIDESHOW ---
   const productsWithImages = products.filter(p => p.image && (p.image.startsWith('http') || p.image.startsWith('data:')));
 
   useEffect(() => {
@@ -97,7 +87,6 @@ export function HomePage() {
       );
     }
 
-    // Se não tem NENHUM produto no banco de dados
     if (products.length === 0) {
       return (
         <div className="text-center p-5 border border-secondary rounded bg-dark mt-4">
@@ -108,7 +97,6 @@ export function HomePage() {
       );
     }
 
-    // Se tem produtos no banco, mas NENHUM nessa categoria específica
     if (filteredProducts.length === 0) {
         return (
           <div className="text-center py-5">
@@ -120,7 +108,6 @@ export function HomePage() {
         );
       }
 
-    // Renderiza a lista FILTRADA
     return (
       <div className="row g-4">
         {filteredProducts.map(product => (
@@ -135,48 +122,34 @@ export function HomePage() {
   return (
     <div style={{ backgroundColor: '#000', minHeight: '100vh', color: '#fff' }}>
       
-      {/* Hero Section (Mantido igual) */}
+      {/* Hero Section */}
       <section className="position-relative py-5 overflow-hidden" style={{ background: 'linear-gradient(180deg, #000 0%, #1a0505 100%)', borderBottom: '1px solid #333' }}>
         <div className="container px-4">
           <div className="row align-items-center gy-5">
-            {/* Texto Esquerda */}
             <div className="col-lg-6 text-center text-lg-start">
               <div className="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill border border-danger bg-danger bg-opacity-10 text-danger small fw-bold mb-4">
                 <i className="bi bi-lightning-charge-fill"></i> Delivery Expresso - 45min
               </div>
-              
-              <h1 className="display-3 fw-black text-white mb-3" style={{ fontWeight: 800 }}>
-                SORVESAN
-              </h1>
-              
+              <h1 className="display-3 fw-black text-white mb-3" style={{ fontWeight: 800 }}>SORVESAN</h1>
               <p className="lead text-secondary mb-4">
                 Sorvetes de qualidade que <span className="text-danger fw-bold">derretem na boca</span>, faça logo seu pedido.
               </p>
-              
               <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
-                <a href="#produtos" className="btn btn-danger btn-lg px-4 py-2 fw-bold shadow-lg">
-                  Ver Cardápio
-                </a>
+                <a href="#produtos" className="btn btn-danger btn-lg px-4 py-2 fw-bold shadow-lg">Ver Cardápio</a>
               </div>
-
-              {/* Stats */}
               <div className="row mt-5 pt-4 border-top border-secondary border-opacity-25">
                 <div className="col-4 text-center text-lg-start">
-                  <div className="h3 fw-bold text-danger mb-0">50+</div>
-                  <div className="small text-secondary">Sabores</div>
+                  <div className="h3 fw-bold text-danger mb-0">50+</div><div className="small text-secondary">Sabores</div>
                 </div>
                 <div className="col-4 text-center text-lg-start border-start border-end border-secondary border-opacity-25">
-                  <div className="h3 fw-bold text-danger mb-0">4.9★</div>
-                  <div className="small text-secondary">Avaliação</div>
+                  <div className="h3 fw-bold text-danger mb-0">4.9★</div><div className="small text-secondary">Avaliação</div>
                 </div>
                 <div className="col-4 text-center text-lg-start">
-                  <div className="h3 fw-bold text-danger mb-0">2.5k+</div>
-                  <div className="small text-secondary">Recomendações</div>
+                  <div className="h3 fw-bold text-danger mb-0">2.5k+</div><div className="small text-secondary">Recomendações</div>
                 </div>
               </div>
             </div>
 
-            {/* Slideshow Direita */}
             <div className="col-lg-6 d-none d-lg-block">
               <div className="position-relative rounded-4 overflow-hidden shadow-lg border border-danger border-opacity-25" style={{ height: '500px' }}>
                 {productsWithImages.length > 0 ? (
@@ -200,12 +173,11 @@ export function HomePage() {
                 )}
               </div>
             </div>
-
           </div>
         </div>
       </section>
 
-      {/* Lista de Produtos + Filtros */}
+      {/* Lista + Filtros */}
       <section id="produtos" className="py-5">
         <div className="container px-4">
           <div className="mb-4">
@@ -216,7 +188,6 @@ export function HomePage() {
             <p className="text-secondary lead">Sorvetes com preço de fábrica.</p>
           </div>
 
-          {/* --- NOVA BARRA DE FILTROS --- */}
           {!isLoading && products.length > 0 && (
             <div className="d-flex flex-wrap gap-2 mb-4 pb-2">
               {categories.map(category => (
@@ -240,15 +211,12 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Animação CSS inline */}
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0.5; transform: scale(1.05); }
           to { opacity: 1; transform: scale(1); }
         }
-        .transition-all {
-            transition: all 0.3s ease;
-        }
+        .transition-all { transition: all 0.3s ease; }
       `}</style>
     </div>
   );

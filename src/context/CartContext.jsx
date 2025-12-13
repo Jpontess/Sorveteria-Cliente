@@ -7,7 +7,7 @@ const CartContext = createContext();
 export function CartProvider({ children }) {
   const [cart, setCart] = useState([]);
 
-  // Função para adicionar ao carrinho
+  // Função para adicionar ao carrinho (ou aumentar quantidade)
   const addToCart = (product) => {
     setCart((prevCart) => {
       // Verifica se o produto já está no carrinho
@@ -25,10 +25,29 @@ export function CartProvider({ children }) {
         return [...prevCart, { ...product, quantity: 1 }];
       }
     });
-    console.log("🛒 Produto adicionado:", product.name);
+    console.log("🛒 Produto adicionado/aumentado:", product.name);
   };
 
-  // Função para remover do carrinho
+  // --- NOVA FUNÇÃO: Diminuir Quantidade ---
+  const decreaseQuantity = (productId) => {
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((item) => item._id === productId);
+
+      // Se a quantidade for maior que 1, diminui 1
+      if (existingItem?.quantity > 1) {
+        return prevCart.map((item) =>
+          item._id === productId 
+            ? { ...item, quantity: item.quantity - 1 } 
+            : item
+        );
+      } else {
+        // Se a quantidade for 1 e apertar menos, remove do carrinho
+        return prevCart.filter((item) => item._id !== productId);
+      }
+    });
+  };
+
+  // Função para remover do carrinho (Remove tudo de uma vez)
   const removeFromCart = (productId) => {
     setCart((prevCart) => prevCart.filter((item) => item._id !== productId));
   };
@@ -49,6 +68,7 @@ export function CartProvider({ children }) {
       value={{ 
         cart, 
         addToCart, 
+        decreaseQuantity, // <--- ADICIONEI AQUI PARA FICAR DISPONÍVEL
         removeFromCart, 
         clearCart, 
         totalItems,
