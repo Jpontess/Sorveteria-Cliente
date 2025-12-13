@@ -1,13 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom'; // <--- IMPORTANTE: Adicionei o Link
 import * as productApi from '../services/productApi';
 import { ProductCard } from '../components/ProductCard';
 import { socket } from '../services/socketsApi';
+import { useCart } from '../context/CartContext'; // <--- IMPORTANTE: Importar o Contexto
 
 export function HomePage() {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Pegamos os dados do carrinho para a barra flutuante
+  const { cart, cartTotal } = useCart(); 
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -109,7 +114,7 @@ export function HomePage() {
       }
 
     return (
-      <div className="row g-4">
+      <div className="row g-4 pb-5"> {/* Adicionei padding-bottom extra para a barra não cobrir o último item */}
         {filteredProducts.map(product => (
           <div key={product._id} className="col-12 col-md-6 col-lg-4 col-xl-3">
             <ProductCard product={product} />
@@ -137,6 +142,8 @@ export function HomePage() {
               <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
                 <a href="#produtos" className="btn btn-danger btn-lg px-4 py-2 fw-bold shadow-lg">Ver Cardápio</a>
               </div>
+              
+              {/* Stats - Simplificado para economizar espaço */}
               <div className="row mt-5 pt-4 border-top border-secondary border-opacity-25">
                 <div className="col-4 text-center text-lg-start">
                   <div className="h3 fw-bold text-danger mb-0">50+</div><div className="small text-secondary">Sabores</div>
@@ -211,10 +218,45 @@ export function HomePage() {
         </div>
       </section>
 
+      {/* --- BARRA FLUTUANTE DO CARRINHO (APARECE SÓ QUANDO TEM ITENS) --- */}
+      {cart.length > 0 && (
+        <div className="fixed-bottom p-3" style={{ zIndex: 1050, animation: 'slideUp 0.3s ease-out' }}>
+          <div className="container">
+            <div 
+              className="d-flex align-items-center justify-content-between p-3 rounded-4 shadow-lg border border-danger border-opacity-25"
+              style={{ backgroundColor: '#18181b' }} // Zinc-900 para combinar com o tema
+            >
+              
+              {/* Esquerda: Info do Total */}
+              <div className="d-flex flex-column ps-2">
+                <span className="text-secondary small">Total (sem entrega)</span>
+                <div className="d-flex align-items-center gap-2">
+                    <span className="text-white fw-bold fs-5">
+                        R$ {cartTotal.toFixed(2).replace('.', ',')}
+                    </span>
+                    <span className="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25 rounded-pill">
+                        {cart.length} itens
+                    </span>
+                </div>
+              </div>
+
+              {/* Direita: Botão Ver Carrinho */}
+              <Link to="/carrinho" className="btn btn-danger btn-lg px-4 fw-bold rounded-pill shadow d-flex align-items-center gap-2">
+                Ver Carrinho <i className="bi bi-arrow-right"></i>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0.5; transform: scale(1.05); }
           to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         .transition-all { transition: all 0.3s ease; }
       `}</style>
